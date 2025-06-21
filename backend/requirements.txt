@@ -2,3 +2,8 @@ fastapi
 uvicorn
 python-multipart
 cryptography
+motor
+pymongo
+python-jose[cryptography]
+passlib
+python-dotenv
