@@ -1,11 +1,11 @@
-<<<<<<< HEAD
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './AuthContext';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import Dashboard from './Dashboard';
+import UserAuth from './UserAuth';
 
 function AppContent() {
   const [showRegister, setShowRegister] = useState(false);
@@ -32,15 +32,6 @@ function AppContent() {
     <LoginForm onSwitchToRegister={() => setShowRegister(true)} />
   );
 }
-=======
-"use client";
-import React, { useState, useEffect } from "react";
-import UploadFile from "./uploadFile";
-import DecryptFile from "./decryptFile";
-import DownloadEncryptedFile from "./downloadEncryptedFile";
-import UserAuth from "./UserAuth";
-import FileSharing from "./FileSharing";
->>>>>>> e2987a459666308d6023f6947a8db15a8987d685
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -86,48 +77,8 @@ export default function Home() {
   }
 
   return (
-<<<<<<< HEAD
     <AuthProvider>
       <AppContent />
     </AuthProvider>
-=======
-    <div style={{ padding: 20, maxWidth: 1200, margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h1>QuantumDocs</h1>
-        <div>
-          <span style={{ marginRight: 10 }}>Welcome, {currentUser?.username}!</span>
-          <button 
-            onClick={handleLogout}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#dc3545',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Logout
-          </button>
-        </div>
-      </div>
-      
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-        <div>
-          <h2>File Operations</h2>
-          <UploadFile token={token} />
-          <hr style={{ margin: '20px 0' }} />
-          <DecryptFile token={token} />
-          <hr style={{ margin: '20px 0' }} />
-          <DownloadEncryptedFile />
-        </div>
-        
-        <div>
-          <h2>File Sharing</h2>
-          <FileSharing token={token} currentUser={currentUser} />
-        </div>
-      </div>
-    </div>
->>>>>>> e2987a459666308d6023f6947a8db15a8987d685
   );
 }
