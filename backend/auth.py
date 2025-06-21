@@ -27,6 +27,7 @@ def get_password_hash(password: str) -> str:
     hashed = hashlib.sha256((password + salt).encode()).hexdigest()
     return f"{salt}${hashed}"
 
+
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
