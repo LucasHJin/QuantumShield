@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Secure File Transfer System
 
 A full-stack secure file transfer application built with post-quantum cryptography, featuring user authentication, encrypted file sharing, and digital signatures.
@@ -333,6 +332,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - **liboqs**: For the pyOQS Python bindings
 - **FastAPI**: For the excellent web framework
 - **Next.js**: For the React framework
-=======
-
->>>>>>> e2987a459666308d6023f6947a8db15a8987d685
