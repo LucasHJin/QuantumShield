@@ -2,3 +2,8 @@ fastapi
 uvicorn
 python-multipart
 cryptography
+passlib[bcrypt]
+python-jose[cryptography]
+sqlalchemy
+python-dotenv
+oqs
