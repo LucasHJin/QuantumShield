@@ -31,10 +31,10 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (username, password) => {
+  const login = async (email, password) => {
     try {
       const formData = new FormData();
-      formData.append('username', username);
+      formData.append('email', email);
       formData.append('password', password);
 
       const response = await axios.post('http://localhost:8000/api/login', formData);
@@ -56,10 +56,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (username, password) => {
+  const register = async (username, email, password) => {
     try {
       const formData = new FormData();
       formData.append('username', username);
+      formData.append('email', email);
       formData.append('password', password);
 
       const response = await axios.post('http://localhost:8000/api/register', formData);

@@ -7,7 +7,7 @@ import Footer from './Footer';
 import toast from 'react-hot-toast';
 
 export default function LoginForm({ onSwitchToRegister, onBackToLanding }) {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
@@ -16,7 +16,7 @@ export default function LoginForm({ onSwitchToRegister, onBackToLanding }) {
     e.preventDefault();
     setIsLoading(true);
 
-    const result = await login(username, password);
+    const result = await login(email, password);
     
     if (result.success) {
       toast.success('Login successful!');
@@ -50,18 +50,18 @@ export default function LoginForm({ onSwitchToRegister, onBackToLanding }) {
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
-                <label htmlFor="username" className="sr-only">
-                  Username
+                <label htmlFor="email" className="sr-only">
+                  Email
                 </label>
                 <input
-                  id="username"
-                  name="username"
-                  type="text"
+                  id="email"
+                  name="email"
+                  type="email"
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-slate-600 placeholder-slate-400 text-white bg-slate-800/50 backdrop-blur-sm rounded-t-md focus:outline-none focus:ring-slate-500 focus:border-slate-500 focus:z-10 sm:text-sm"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div>

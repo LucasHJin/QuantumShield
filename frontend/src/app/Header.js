@@ -35,7 +35,7 @@ export default function Header({ showAuthButtons = false, onSwitchToLogin, onSwi
           </div>
 
           {/* Right side - Auth buttons or user info */}
-          <div className="flex items-center justify-end w-48 h-full">
+          <div className="flex items-center justify-end w-64 h-full">
             {showAuthButtons ? (
               <div className="flex items-center space-x-4">
                 <button
@@ -61,7 +61,7 @@ export default function Header({ showAuthButtons = false, onSwitchToLogin, onSwi
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <span className="text-sm text-slate-300 truncate max-w-24">
+                <span className="text-sm text-slate-300">
                   Welcome, <span className="font-semibold text-white">{user}</span>
                 </span>
                 <button

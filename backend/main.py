@@ -10,9 +10,10 @@ import uuid
 import os
 from typing import List, Optional
 import tempfile
+import re
 
 from database import (
-    find_user_by_username, create_user, get_all_users, 
+    find_user_by_username, find_user_by_email, create_user, get_all_users, 
     create_file_record, find_file_by_id, get_received_files, 
     get_sent_files, health_check, get_db, User, FileRecord
 )
@@ -51,18 +52,23 @@ def is_file_allowed(filename: str) -> bool:
         return False
     return any(filename.lower().endswith(ext) for ext in ALLOWED_EXTENSIONS)
 
+def is_valid_email(email: str) -> bool:
+    """Validate email format"""
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
 # Dependency to get current user
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)) -> User:
     token = credentials.credentials
-    username = verify_token(token)
-    if not username:
+    email = verify_token(token)
+    if not email:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    user_data = await find_user_by_username(db, username)
+    user_data = await find_user_by_email(db, email)
     if not user_data:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -79,9 +85,9 @@ async def test_endpoint():
 
 # User registration
 @app.post("/api/register")
-async def register_user(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+async def register_user(username: str = Form(...), email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     try:
-        print(f"Registration attempt for username: {username}")
+        print(f"Registration attempt for username: {username}, email: {email}")
         print(f"Password length: {len(password)}")
         
         # Validate input
@@ -89,18 +95,29 @@ async def register_user(username: str = Form(...), password: str = Form(...), db
             print(f"Username too short: {len(username)} characters")
             raise HTTPException(status_code=400, detail="Username must be at least 3 characters")
         
+        if not is_valid_email(email):
+            print(f"Invalid email format: {email}")
+            raise HTTPException(status_code=400, detail="Invalid email format")
+        
         if len(password) < 6:
             print(f"Password too short: {len(password)} characters")
             raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
         
         print("Input validation passed")
         
-        # Check if user already exists
-        print("Checking if user exists...")
-        existing_user = await find_user_by_username(db, username)
-        if existing_user:
-            print(f"User {username} already exists")
-            raise HTTPException(status_code=400, detail="Username already registered")
+        # Check if user already exists by email
+        print("Checking if user exists by email...")
+        existing_user_by_email = await find_user_by_email(db, email)
+        if existing_user_by_email:
+            print(f"User with email {email} already exists")
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        # Check if username already exists
+        print("Checking if username exists...")
+        existing_user_by_username = await find_user_by_username(db, username)
+        if existing_user_by_username:
+            print(f"Username {username} already exists")
+            raise HTTPException(status_code=400, detail="Username already taken")
         
         print("User does not exist, proceeding with creation")
         
@@ -112,6 +129,7 @@ async def register_user(username: str = Form(...), password: str = Form(...), db
         # Create user
         user = User(
             username=username,
+            email=email,
             password_hash=password_hash
         )
         print("User object created")
@@ -121,7 +139,7 @@ async def register_user(username: str = Form(...), password: str = Form(...), db
         result = await create_user(db, user)
         print(f"User created with ID: {result.id}")
         
-        return {"message": "User registered successfully", "username": username}
+        return {"message": "User registered successfully", "username": username, "email": email}
         
     except HTTPException:
         print("HTTPException raised, re-raising")
@@ -135,16 +153,16 @@ async def register_user(username: str = Form(...), password: str = Form(...), db
 
 # User login
 @app.post("/api/login")
-async def login(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+async def login(email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     try:
-        print(f"Login attempt for username: {username}")
+        print(f"Login attempt for email: {email}")
         print(f"Password length: {len(password)}")
         
-        # Find user
-        print("Looking up user in database...")
-        user_data = await find_user_by_username(db, username)
+        # Find user by email
+        print("Looking up user in database by email...")
+        user_data = await find_user_by_email(db, email)
         if not user_data:
-            print(f"User {username} not found in database")
+            print(f"User with email {email} not found in database")
             raise HTTPException(status_code=401, detail="Invalid credentials")
         
         print(f"User found: {user_data}")
@@ -163,12 +181,12 @@ async def login(username: str = Form(...), password: str = Form(...), db: Sessio
         
         print("Password verified successfully")
         
-        # Create access token
+        # Create access token (use email as subject)
         print("Creating access token...")
-        access_token = create_access_token(data={"sub": username})
+        access_token = create_access_token(data={"sub": email})
         print("Access token created")
         
-        return {"access_token": access_token, "token_type": "bearer", "username": username}
+        return {"access_token": access_token, "token_type": "bearer", "username": user.username, "email": email}
         
     except HTTPException:
         print("HTTPException raised in login, re-raising")

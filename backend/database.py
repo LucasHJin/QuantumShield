@@ -13,14 +13,16 @@ def get_db():
 
 # User model
 class User:
-    def __init__(self, username: str, password_hash: str, id: Optional[int] = None):
+    def __init__(self, username: str, email: str, password_hash: str, id: Optional[int] = None):
         self.username = username
+        self.email = email
         self.password_hash = password_hash
         self.id = id
 
     def to_dict(self):
         return {
             "username": self.username,
+            "email": self.email,
             "password_hash": self.password_hash
         }
 
@@ -28,6 +30,7 @@ class User:
     def from_dict(cls, data: dict):
         return cls(
             username=data["username"],
+            email=data["email"],
             password_hash=data["password_hash"],
             id=data.get("id")
         )
@@ -77,12 +80,25 @@ class FileRecord:
         )
 
 # Database operations
+async def find_user_by_email(db: Session, email: str) -> Optional[User]:
+    """Find user by email"""
+    user = db.query(UserModel).filter(UserModel.email == email).first()
+    if user:
+        return User(
+            username=user.username,
+            email=user.email,
+            password_hash=user.hashed_password,
+            id=user.id
+        )
+    return None
+
 async def find_user_by_username(db: Session, username: str) -> Optional[User]:
     """Find user by username"""
     user = db.query(UserModel).filter(UserModel.username == username).first()
     if user:
         return User(
             username=user.username,
+            email=user.email,
             password_hash=user.hashed_password,
             id=user.id
         )
@@ -92,6 +108,7 @@ async def create_user(db: Session, user: User) -> User:
     """Create a new user"""
     db_user = UserModel(
         username=user.username,
+        email=user.email,
         hashed_password=user.password_hash
     )
     db.add(db_user)
@@ -99,6 +116,7 @@ async def create_user(db: Session, user: User) -> User:
     db.refresh(db_user)
     return User(
         username=db_user.username,
+        email=db_user.email,
         password_hash=db_user.hashed_password,
         id=db_user.id
     )
@@ -112,6 +130,7 @@ async def get_all_users(db: Session, exclude_username: str = None) -> List[User]
     return [
         User(
             username=user.username,
+            email=user.email,
             password_hash=user.hashed_password,
             id=user.id
         ) for user in users
@@ -233,9 +252,11 @@ async def get_sent_files(db: Session, username: str) -> List[FileRecord]:
     return files
 
 async def health_check(db: Session) -> bool:
-    """Health check for database"""
+    """Check database health"""
     try:
+        # Try to query the database
         db.query(UserModel).first()
         return True
-    except Exception:
+    except Exception as e:
+        print(f"Database health check failed: {e}")
         return False 

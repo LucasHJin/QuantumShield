@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 
 export default function RegisterForm({ onSwitchToLogin, onBackToLanding }) {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -26,9 +27,16 @@ export default function RegisterForm({ onSwitchToLogin, onBackToLanding }) {
       return;
     }
 
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
     setIsLoading(true);
 
-    const result = await register(username, password);
+    const result = await register(username, email, password);
     
     if (result.success) {
       toast.success(result.message);
@@ -57,7 +65,7 @@ export default function RegisterForm({ onSwitchToLogin, onBackToLanding }) {
               Create your account
             </h2>
             <p className="mt-2 text-center text-sm text-slate-400">
-              Join the most secure file transfer system
+              Join the Secure File Transfer System
             </p>
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -75,6 +83,21 @@ export default function RegisterForm({ onSwitchToLogin, onBackToLanding }) {
                   placeholder="Username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+              <div>
+                <label htmlFor="email" className="sr-only">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-slate-600 placeholder-slate-400 text-white bg-slate-800/50 backdrop-blur-sm focus:outline-none focus:ring-slate-500 focus:border-slate-500 focus:z-10 sm:text-sm"
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div>
