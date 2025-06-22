@@ -22,14 +22,14 @@ export default function Dashboard({ onBackToLanding }) {
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component;
 
   return (
-    <div className="min-h-screen gradient-bg flex flex-col">
+    <div className="min-h-screen bg-black flex flex-col">
       <Toaster 
         position="top-right"
         toastOptions={{
           style: {
-            background: '#1e293b',
-            color: '#e2e8f0',
-            border: '1px solid #475569',
+            background: '#3b275f',
+            color: '#eadaff',
+            border: '1px solid #eadaff',
           },
         }}
       />
@@ -42,7 +42,7 @@ export default function Dashboard({ onBackToLanding }) {
       />
 
       {/* Navigation */}
-      <nav className="gradient-bg-alt border-b border-slate-700/50 backdrop-blur-sm">
+      <nav className="bg-black border-b border-[#eadaff]/30 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             {tabs.map((tab) => (
@@ -51,8 +51,8 @@ export default function Dashboard({ onBackToLanding }) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-400'
-                    : 'border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-600'
+                    ? 'border-[#f38cff] text-[#f38cff]'
+                    : 'border-transparent text-[#eadaff] hover:text-white hover:border-[#eadaff]'
                 }`}
               >
                 {tab.name}

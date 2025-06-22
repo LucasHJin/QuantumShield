@@ -20,7 +20,7 @@ export default function Header({ showAuthButtons = false, onSwitchToLogin, onSwi
   };
 
   return (
-    <header className="gradient-bg-alt border-b border-slate-700/50 shadow-lg backdrop-blur-sm h-20">
+    <header className="bg-black border-b border-[#eadaff]/30 shadow-lg backdrop-blur-sm h-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
         <div className="flex justify-between items-center h-full">
           {/* Logo and Brand */}
@@ -41,7 +41,7 @@ export default function Header({ showAuthButtons = false, onSwitchToLogin, onSwi
               <h1 className="text-2xl font-bold text-white">
                 QuantumShield
               </h1>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-[#eadaff]">
                 Post-Quantum Cryptography
               </p>
             </div>
@@ -55,8 +55,8 @@ export default function Header({ showAuthButtons = false, onSwitchToLogin, onSwi
                   onClick={onSwitchToLogin}
                   className={`px-4 py-2 rounded-md transition-all duration-200 text-sm font-medium w-20 ${
                     activeAuthTab === 'login'
-                      ? 'bg-slate-600 text-white shadow-lg'
-                      : 'text-slate-300 hover:text-white'
+                      ? 'bg-[#3b275f] text-white shadow-lg'
+                      : 'text-[#eadaff] hover:text-white'
                   }`}
                 >
                   Login
@@ -65,8 +65,8 @@ export default function Header({ showAuthButtons = false, onSwitchToLogin, onSwi
                   onClick={onSwitchToRegister}
                   className={`px-4 py-2 rounded-md transition-all duration-200 text-sm font-medium w-20 ${
                     activeAuthTab === 'register'
-                      ? 'bg-slate-600 text-white shadow-lg'
-                      : 'text-slate-300 hover:text-white'
+                      ? 'bg-[#3b275f] text-white shadow-lg'
+                      : 'text-[#eadaff] hover:text-white'
                   }`}
                 >
                   Register
@@ -74,10 +74,10 @@ export default function Header({ showAuthButtons = false, onSwitchToLogin, onSwi
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <span className="text-sm text-slate-300">
+                <span className="text-sm text-[#eadaff]">
                   Welcome,{' '}
                   <span 
-                    className={`font-semibold text-white ${onBackToDashboard ? 'cursor-pointer hover:text-slate-300 transition-colors duration-200' : ''}`}
+                    className={`font-semibold text-white ${onBackToDashboard ? 'cursor-pointer hover:text-[#eadaff] transition-colors duration-200' : ''}`}
                     onClick={handleUserNameClick}
                   >
                     {user}
@@ -85,7 +85,7 @@ export default function Header({ showAuthButtons = false, onSwitchToLogin, onSwi
                 </span>
                 <button
                   onClick={logout}
-                  className="px-4 py-2 bg-slate-700 text-slate-200 rounded-md hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all duration-200 shadow-lg text-sm font-medium w-20"
+                  className="px-4 py-2 bg-[#3b275f] text-white rounded-md hover:bg-[#eadaff] focus:outline-none focus:ring-2 focus:ring-[#eadaff] focus:ring-offset-2 focus:ring-offset-black transition-all duration-200 shadow-lg text-sm font-medium w-20"
                 >
                   Logout
                 </button>

@@ -28,7 +28,7 @@ export default function LoginForm({ onSwitchToRegister, onBackToLanding }) {
   };
 
   return (
-    <div className="min-h-screen gradient-bg flex flex-col">
+    <div className="min-h-screen bg-black flex flex-col">
       <Header 
         showAuthButtons={true} 
         onSwitchToLogin={() => {}} 
@@ -43,7 +43,7 @@ export default function LoginForm({ onSwitchToRegister, onBackToLanding }) {
             <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
               Sign in to your account
             </h2>
-            <p className="mt-2 text-center text-sm text-slate-400">
+            <p className="mt-2 text-center text-sm text-[#eadaff]">
               Access your secure file transfer dashboard
             </p>
           </div>
@@ -58,7 +58,7 @@ export default function LoginForm({ onSwitchToRegister, onBackToLanding }) {
                   name="email"
                   type="email"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-slate-600 placeholder-slate-400 text-white bg-slate-800/50 backdrop-blur-sm rounded-t-md focus:outline-none focus:ring-slate-500 focus:border-slate-500 focus:z-10 sm:text-sm"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#eadaff] placeholder-[#eadaff] text-white bg-[#3b275f]/20 backdrop-blur-sm rounded-t-md focus:outline-none focus:ring-[#eadaff] focus:border-[#eadaff] focus:z-10 sm:text-sm"
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -73,7 +73,7 @@ export default function LoginForm({ onSwitchToRegister, onBackToLanding }) {
                   name="password"
                   type="password"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-slate-600 placeholder-slate-400 text-white bg-slate-800/50 backdrop-blur-sm rounded-b-md focus:outline-none focus:ring-slate-500 focus:border-slate-500 focus:z-10 sm:text-sm"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#eadaff] placeholder-[#eadaff] text-white bg-[#3b275f]/20 backdrop-blur-sm rounded-b-md focus:outline-none focus:ring-[#eadaff] focus:border-[#eadaff] focus:z-10 sm:text-sm"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -85,7 +85,7 @@ export default function LoginForm({ onSwitchToRegister, onBackToLanding }) {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-slate-600 hover:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 disabled:opacity-50 transition-all duration-200 shadow-lg"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#3b275f] hover:bg-[#eadaff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#eadaff] disabled:opacity-50 transition-all duration-200 shadow-lg"
               >
                 {isLoading ? 'Signing in...' : 'Sign in'}
               </button>
@@ -95,7 +95,7 @@ export default function LoginForm({ onSwitchToRegister, onBackToLanding }) {
               <button
                 type="button"
                 onClick={onSwitchToRegister}
-                className="text-slate-400 hover:text-slate-300 text-sm cursor-pointer inline-block transition-colors duration-200"
+                className="text-[#eadaff] hover:text-white text-sm cursor-pointer inline-block transition-colors duration-200"
               >
                 Don't have an account? <span className="underline">Register here</span>
               </button>

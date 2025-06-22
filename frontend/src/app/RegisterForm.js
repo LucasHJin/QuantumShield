@@ -49,7 +49,7 @@ export default function RegisterForm({ onSwitchToLogin, onBackToLanding }) {
   };
 
   return (
-    <div className="min-h-screen gradient-bg flex flex-col">
+    <div className="min-h-screen bg-black flex flex-col">
       <Header 
         showAuthButtons={true} 
         onSwitchToLogin={onSwitchToLogin} 
@@ -64,7 +64,7 @@ export default function RegisterForm({ onSwitchToLogin, onBackToLanding }) {
             <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
               Create your account
             </h2>
-            <p className="mt-2 text-center text-sm text-slate-400">
+            <p className="mt-2 text-center text-sm text-[#eadaff]">
               Join the Secure File Transfer System
             </p>
           </div>
@@ -79,7 +79,7 @@ export default function RegisterForm({ onSwitchToLogin, onBackToLanding }) {
                   name="username"
                   type="text"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-slate-600 placeholder-slate-400 text-white bg-slate-800/50 backdrop-blur-sm rounded-t-md focus:outline-none focus:ring-slate-500 focus:border-slate-500 focus:z-10 sm:text-sm"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#eadaff] placeholder-[#eadaff] text-white bg-[#3b275f]/20 backdrop-blur-sm rounded-t-md focus:outline-none focus:ring-[#eadaff] focus:border-[#eadaff] focus:z-10 sm:text-sm"
                   placeholder="Username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -94,7 +94,7 @@ export default function RegisterForm({ onSwitchToLogin, onBackToLanding }) {
                   name="email"
                   type="email"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-slate-600 placeholder-slate-400 text-white bg-slate-800/50 backdrop-blur-sm focus:outline-none focus:ring-slate-500 focus:border-slate-500 focus:z-10 sm:text-sm"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#eadaff] placeholder-[#eadaff] text-white bg-[#3b275f]/20 backdrop-blur-sm focus:outline-none focus:ring-[#eadaff] focus:border-[#eadaff] focus:z-10 sm:text-sm"
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -109,7 +109,7 @@ export default function RegisterForm({ onSwitchToLogin, onBackToLanding }) {
                   name="password"
                   type="password"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-slate-600 placeholder-slate-400 text-white bg-slate-800/50 backdrop-blur-sm focus:outline-none focus:ring-slate-500 focus:border-slate-500 focus:z-10 sm:text-sm"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#eadaff] placeholder-[#eadaff] text-white bg-[#3b275f]/20 backdrop-blur-sm focus:outline-none focus:ring-[#eadaff] focus:border-[#eadaff] focus:z-10 sm:text-sm"
                   placeholder="Password (min 6 characters)"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -124,7 +124,7 @@ export default function RegisterForm({ onSwitchToLogin, onBackToLanding }) {
                   name="confirmPassword"
                   type="password"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-slate-600 placeholder-slate-400 text-white bg-slate-800/50 backdrop-blur-sm rounded-b-md focus:outline-none focus:ring-slate-500 focus:border-slate-500 focus:z-10 sm:text-sm"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#eadaff] placeholder-[#eadaff] text-white bg-[#3b275f]/20 backdrop-blur-sm rounded-b-md focus:outline-none focus:ring-[#eadaff] focus:border-[#eadaff] focus:z-10 sm:text-sm"
                   placeholder="Confirm Password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -136,7 +136,7 @@ export default function RegisterForm({ onSwitchToLogin, onBackToLanding }) {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-slate-600 hover:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 disabled:opacity-50 transition-all duration-200 shadow-lg"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#3b275f] hover:bg-[#eadaff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#eadaff] disabled:opacity-50 transition-all duration-200 shadow-lg"
               >
                 {isLoading ? 'Creating account...' : 'Create account'}
               </button>
@@ -146,7 +146,7 @@ export default function RegisterForm({ onSwitchToLogin, onBackToLanding }) {
               <button
                 type="button"
                 onClick={onSwitchToLogin}
-                className="text-slate-400 hover:text-slate-300 text-sm cursor-pointer inline-block transition-colors duration-200"
+                className="text-[#eadaff] hover:text-white text-sm cursor-pointer inline-block transition-colors duration-200"
               >
                 Already have an account? <span className="underline">Sign in here</span>
               </button>

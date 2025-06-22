@@ -54,19 +54,19 @@ export default function FileInbox() {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto min-w-[600px] bg-slate-800/50 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-slate-700/50">
+      <div className="max-w-4xl mx-auto min-w-[600px] bg-[#3b275f]/20 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-[#eadaff]/30">
         <h2 className="text-xl font-semibold mb-4 text-white">Received Files</h2>
-        <div className="text-center text-slate-400">Loading files...</div>
+        <div className="text-center text-[#eadaff]">Loading files...</div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto min-w-[600px] bg-slate-800/50 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-slate-700/50">
+    <div className="max-w-4xl mx-auto min-w-[600px] bg-[#3b275f]/20 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-[#eadaff]/30">
       <h2 className="text-xl font-semibold mb-4 text-white">Received Files</h2>
       
       {receivedFiles.length === 0 ? (
-        <div className="text-center py-8 text-slate-400">
+        <div className="text-center py-8 text-[#eadaff]">
           <p>No files received yet.</p>
         </div>
       ) : (
@@ -74,22 +74,22 @@ export default function FileInbox() {
           {receivedFiles.map((file) => (
             <div
               key={file.file_id}
-              className="border border-slate-600/50 rounded-lg p-4 hover:bg-slate-700/30 transition-all duration-200 backdrop-blur-sm"
+              className="border border-[#eadaff]/30 rounded-lg p-4 hover:bg-[#3b275f]/30 transition-all duration-200 backdrop-blur-sm"
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <h3 className="font-medium text-white">{file.filename}</h3>
-                  <p className="text-sm text-slate-400">
+                  <p className="text-sm text-[#eadaff]">
                     From: {file.sender_username}
                   </p>
-                  <p className="text-sm text-slate-400">
+                  <p className="text-sm text-[#eadaff]">
                     File ID: {file.file_id}
                   </p>
                 </div>
                 <button
                   onClick={() => handleDownload(file.file_id, file.filename)}
                   disabled={downloadingFile === file.file_id}
-                  className="ml-4 px-4 py-2 bg-slate-600 text-white rounded-md hover:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500 disabled:opacity-50 transition-all duration-200 shadow-lg"
+                  className="ml-4 px-4 py-2 bg-[#3b275f] text-white rounded-md hover:bg-[#eadaff] focus:outline-none focus:ring-2 focus:ring-[#eadaff] disabled:opacity-50 transition-all duration-200 shadow-lg"
                 >
                   {downloadingFile === file.file_id ? 'Decrypting...' : 'Download & Decrypt'}
                 </button>
@@ -102,7 +102,7 @@ export default function FileInbox() {
       <div className="mt-6">
         <button
           onClick={loadReceivedFiles}
-          className="px-4 py-2 bg-slate-600 text-white rounded-md hover:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500 transition-all duration-200 shadow-lg"
+          className="px-4 py-2 bg-[#3b275f] text-white rounded-md hover:bg-[#eadaff] focus:outline-none focus:ring-2 focus:ring-[#eadaff] transition-all duration-200 shadow-lg"
         >
           Refresh
         </button>
