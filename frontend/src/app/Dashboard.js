@@ -5,11 +5,13 @@ import { useAuth } from './AuthContext';
 import FileUpload from './FileUpload';
 import FileInbox from './FileInbox';
 import SentFiles from './SentFiles';
+import Header from './Header';
+import Footer from './Footer';
 import { Toaster } from 'react-hot-toast';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('upload');
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   const tabs = [
     { id: 'upload', name: 'Upload File', component: FileUpload },
@@ -20,48 +22,33 @@ export default function Dashboard() {
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Toaster position="top-right" />
+    <div className="min-h-screen gradient-bg flex flex-col">
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: '#1e293b',
+            color: '#e2e8f0',
+            border: '1px solid #475569',
+          },
+        }}
+      />
       
       {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Secure File Transfer System
-              </h1>
-              <p className="text-sm text-gray-600">
-                Post-Quantum Cryptography Powered
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                Welcome, <span className="font-semibold">{user}</span>
-              </span>
-              <button
-                onClick={logout}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Navigation */}
-      <nav className="bg-white">
+      <nav className="gradient-bg-alt border-b border-slate-700/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
                   activeTab === tab.id
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-500 text-blue-400'
+                    : 'border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-600'
                 }`}
               >
                 {tab.name}
@@ -78,19 +65,7 @@ export default function Dashboard() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white mt-12">
-        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-sm text-gray-500">
-            <p>
-              Built with Kyber (Key Encapsulation) and Dilithium (Digital Signatures)
-            </p>
-            <p className="mt-1">
-              Post-Quantum Cryptography for Secure File Transfer
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 } 

@@ -73,37 +73,37 @@ export default function FileUpload() {
 
   if (isLoadingUsers) {
     return (
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold mb-4">Upload File</h2>
-        <div className="text-center">Loading users...</div>
+      <div className="max-w-md mx-auto min-w-[600px] bg-slate-800/50 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-slate-700/50">
+        <h2 className="text-xl font-semibold mb-4 text-white">Upload File</h2>
+        <div className="text-center text-slate-400">Loading users...</div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-4">Upload File</h2>
+    <div className="max-w-md mx-auto min-w-[600px] bg-slate-800/50 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-slate-700/50">
+      <h2 className="text-xl font-semibold mb-4 text-white">Upload File</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-slate-300 mb-2">
             Select File
           </label>
           <input
             type="file"
             onChange={handleFileChange}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+            className="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-600 file:text-white hover:file:bg-slate-500 transition-all duration-200"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-slate-300 mb-2">
             Recipient
           </label>
           <select
             value={recipient}
             onChange={(e) => setRecipient(e.target.value)}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full px-3 py-2 border border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-slate-500 focus:border-slate-500 bg-slate-700/50 backdrop-blur-sm text-white"
             required
           >
             <option value="">Select a recipient</option>
@@ -118,18 +118,18 @@ export default function FileUpload() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-lg text-sm font-medium text-white bg-slate-600 hover:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 disabled:opacity-50 transition-all duration-200"
         >
           {isLoading ? 'Uploading...' : 'Upload & Encrypt'}
         </button>
       </form>
 
       {selectedFile && (
-        <div className="mt-4 p-3 bg-gray-50 rounded-md">
-          <p className="text-sm text-gray-600">
+        <div className="mt-4 p-3 bg-slate-700/50 backdrop-blur-sm rounded-md border border-slate-600/50">
+          <p className="text-sm text-slate-300">
             <strong>Selected file:</strong> {selectedFile.name}
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-300">
             <strong>Size:</strong> {(selectedFile.size / 1024).toFixed(2)} KB
           </p>
         </div>

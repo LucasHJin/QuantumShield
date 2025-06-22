@@ -1,4 +1,4 @@
-# Secure File Transfer System
+# QuantumShield
 
 A full-stack secure file transfer application built with post-quantum cryptography, featuring user authentication, encrypted file sharing, and digital signatures.
 
