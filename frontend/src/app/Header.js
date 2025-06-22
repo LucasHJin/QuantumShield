@@ -3,8 +3,21 @@
 import { useAuth } from './AuthContext';
 import Image from 'next/image';
 
-export default function Header({ showAuthButtons = false, onSwitchToLogin, onSwitchToRegister, onBackToLanding, activeAuthTab = 'login' }) {
+export default function Header({ showAuthButtons = false, onSwitchToLogin, onSwitchToRegister, onBackToLanding, onBackToDashboard, activeAuthTab = 'login' }) {
   const { user, logout } = useAuth();
+
+  const handleLogoClick = () => {
+    if (onBackToLanding) {
+      // Use the provided function to navigate back to landing page
+      onBackToLanding();
+    }
+  };
+
+  const handleUserNameClick = () => {
+    if (onBackToDashboard) {
+      onBackToDashboard();
+    }
+  };
 
   return (
     <header className="gradient-bg-alt border-b border-slate-700/50 shadow-lg backdrop-blur-sm h-20">
@@ -12,8 +25,8 @@ export default function Header({ showAuthButtons = false, onSwitchToLogin, onSwi
         <div className="flex justify-between items-center h-full">
           {/* Logo and Brand */}
           <div 
-            className={`flex items-center space-x-3 ${onBackToLanding ? 'cursor-pointer hover:opacity-80 transition-opacity duration-200' : ''}`}
-            onClick={onBackToLanding}
+            className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity duration-200"
+            onClick={handleLogoClick}
           >
             <div className="relative w-10 h-10">
               <Image
@@ -26,7 +39,7 @@ export default function Header({ showAuthButtons = false, onSwitchToLogin, onSwi
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white">
-                Quantum Shield
+                QuantumShield
               </h1>
               <p className="text-sm text-slate-400">
                 Post-Quantum Cryptography
@@ -62,7 +75,13 @@ export default function Header({ showAuthButtons = false, onSwitchToLogin, onSwi
             ) : (
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-slate-300">
-                  Welcome, <span className="font-semibold text-white">{user}</span>
+                  Welcome,{' '}
+                  <span 
+                    className={`font-semibold text-white ${onBackToDashboard ? 'cursor-pointer hover:text-slate-300 transition-colors duration-200' : ''}`}
+                    onClick={handleUserNameClick}
+                  >
+                    {user}
+                  </span>
                 </span>
                 <button
                   onClick={logout}

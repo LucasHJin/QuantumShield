@@ -5,13 +5,14 @@ import Header from './Header';
 import Footer from './Footer';
 import Image from 'next/image';
 
-export default function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
+export default function LandingPage({ onSwitchToLogin, onSwitchToRegister, onBackToDashboard, isLoggedIn = false }) {
   return (
     <div className="min-h-screen gradient-bg">
       <Header 
-        showAuthButtons={true} 
+        showAuthButtons={!isLoggedIn} 
         onSwitchToLogin={onSwitchToLogin} 
         onSwitchToRegister={onSwitchToRegister}
+        onBackToDashboard={isLoggedIn ? onBackToDashboard : undefined}
         activeAuthTab=""
       />
       
@@ -37,18 +38,29 @@ export default function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button
-              onClick={onSwitchToRegister}
-              className="px-8 py-4 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition-all duration-200 shadow-lg text-lg font-semibold"
-            >
-              Get Started
-            </button>
-            <button
-              onClick={onSwitchToLogin}
-              className="px-8 py-4 border border-slate-600 text-slate-300 rounded-lg hover:bg-slate-700/50 transition-all duration-200 text-lg font-semibold"
-            >
-              Sign In
-            </button>
+            {isLoggedIn ? (
+              <button
+                onClick={onBackToDashboard}
+                className="px-8 py-4 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition-all duration-200 shadow-lg text-lg font-semibold"
+              >
+                Back to Dashboard
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={onSwitchToRegister}
+                  className="px-8 py-4 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition-all duration-200 shadow-lg text-lg font-semibold"
+                >
+                  Get Started
+                </button>
+                <button
+                  onClick={onSwitchToLogin}
+                  className="px-8 py-4 border border-slate-600 text-slate-300 rounded-lg hover:bg-slate-700/50 transition-all duration-200 text-lg font-semibold"
+                >
+                  Sign In
+                </button>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -170,12 +182,21 @@ export default function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
           <p className="text-xl text-slate-400 mb-8">
             Join thousands of users who trust Quantum Shield for their sensitive document sharing needs.
           </p>
-          <button
-            onClick={onSwitchToLogin}
-            className="px-8 py-4 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition-all duration-200 shadow-lg text-lg font-semibold"
-          >
-            Get Started Now
-          </button>
+          {isLoggedIn ? (
+            <button
+              onClick={onBackToDashboard}
+              className="px-8 py-4 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition-all duration-200 shadow-lg text-lg font-semibold"
+            >
+              Back to Dashboard
+            </button>
+          ) : (
+            <button
+              onClick={onSwitchToLogin}
+              className="px-8 py-4 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition-all duration-200 shadow-lg text-lg font-semibold"
+            >
+              Get Started Now
+            </button>
+          )}
         </div>
       </section>
 

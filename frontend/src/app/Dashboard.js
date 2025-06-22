@@ -9,7 +9,7 @@ import Header from './Header';
 import Footer from './Footer';
 import { Toaster } from 'react-hot-toast';
 
-export default function Dashboard() {
+export default function Dashboard({ onBackToLanding }) {
   const [activeTab, setActiveTab] = useState('upload');
   const { user } = useAuth();
 
@@ -35,7 +35,11 @@ export default function Dashboard() {
       />
       
       {/* Header */}
-      <Header />
+      <Header 
+        showAuthButtons={false} 
+        onBackToLanding={onBackToLanding}
+        activeAuthTab=""
+      />
 
       {/* Navigation */}
       <nav className="gradient-bg-alt border-b border-slate-700/50 backdrop-blur-sm">

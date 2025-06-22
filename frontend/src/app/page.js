@@ -8,8 +8,17 @@ import Dashboard from './Dashboard';
 import LandingPage from './LandingPage';
 
 function AppContent() {
-  const [currentView, setCurrentView] = useState('landing'); // 'landing', 'login', 'register'
+  const [currentView, setCurrentView] = useState('landing'); // 'landing', 'login', 'register', 'dashboard'
   const { user, loading } = useAuth();
+
+  const handleBackToLanding = () => {
+    // Just show the landing page without logging out
+    setCurrentView('landing');
+  };
+
+  const handleBackToDashboard = () => {
+    setCurrentView('dashboard');
+  };
 
   if (loading) {
     return (
@@ -22,16 +31,23 @@ function AppContent() {
     );
   }
 
-  if (user) {
-    return <Dashboard />;
+  // If user is logged in and we're not explicitly showing landing page, show dashboard
+  if (user && currentView !== 'landing') {
+    return (
+      <Dashboard 
+        onBackToLanding={handleBackToLanding}
+      />
+    );
   }
 
-  // Show landing page by default when not logged in
+  // Show landing page (either when not logged in or when explicitly requested)
   if (currentView === 'landing') {
     return (
       <LandingPage 
         onSwitchToLogin={() => setCurrentView('login')}
         onSwitchToRegister={() => setCurrentView('register')}
+        onBackToDashboard={user ? handleBackToDashboard : undefined}
+        isLoggedIn={!!user}
       />
     );
   }
