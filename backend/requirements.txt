@@ -2,8 +2,7 @@ fastapi
 uvicorn
 python-multipart
 cryptography
-motor
-pymongo
+sqlalchemy
 python-jose[cryptography]
 passlib
 python-dotenv

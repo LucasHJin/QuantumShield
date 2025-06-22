@@ -5,12 +5,17 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Depends, sta
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy.orm import Session
 import uuid
 import os
 from typing import List, Optional
 import tempfile
 
-from database import users_collection, files_collection, User, FileRecord
+from database import (
+    find_user_by_username, create_user, get_all_users, 
+    create_file_record, find_file_by_id, get_received_files, 
+    get_sent_files, health_check, get_db, User, FileRecord
+)
 from auth import get_password_hash, verify_password, create_access_token, verify_token
 from crypto_utils import (
     encrypt_file_for_user, 
@@ -47,7 +52,7 @@ def is_file_allowed(filename: str) -> bool:
     return any(filename.lower().endswith(ext) for ext in ALLOWED_EXTENSIONS)
 
 # Dependency to get current user
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> User:
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)) -> User:
     token = credentials.credentials
     username = verify_token(token)
     if not username:
@@ -57,7 +62,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    user_data = await users_collection.find_one({"username": username})
+    user_data = await find_user_by_username(db, username)
     if not user_data:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -65,7 +70,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    return User.from_dict(user_data)
+    return user_data
 
 # Test endpoint
 @app.get("/api/test")
@@ -74,7 +79,7 @@ async def test_endpoint():
 
 # User registration
 @app.post("/api/register")
-async def register_user(username: str = Form(...), password: str = Form(...)):
+async def register_user(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     try:
         print(f"Registration attempt for username: {username}")
         print(f"Password length: {len(password)}")
@@ -92,7 +97,7 @@ async def register_user(username: str = Form(...), password: str = Form(...)):
         
         # Check if user already exists
         print("Checking if user exists...")
-        existing_user = await users_collection.find_one({"username": username})
+        existing_user = await find_user_by_username(db, username)
         if existing_user:
             print(f"User {username} already exists")
             raise HTTPException(status_code=400, detail="Username already registered")
@@ -113,8 +118,8 @@ async def register_user(username: str = Form(...), password: str = Form(...)):
         
         # Save to database
         print("Saving to database...")
-        result = await users_collection.insert_one(user.to_dict())
-        print(f"User created with ID: {result.inserted_id}")
+        result = await create_user(db, user)
+        print(f"User created with ID: {result.id}")
         
         return {"message": "User registered successfully", "username": username}
         
@@ -130,20 +135,20 @@ async def register_user(username: str = Form(...), password: str = Form(...)):
 
 # User login
 @app.post("/api/login")
-async def login(username: str = Form(...), password: str = Form(...)):
+async def login(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     try:
         print(f"Login attempt for username: {username}")
         print(f"Password length: {len(password)}")
         
         # Find user
         print("Looking up user in database...")
-        user_data = await users_collection.find_one({"username": username})
+        user_data = await find_user_by_username(db, username)
         if not user_data:
             print(f"User {username} not found in database")
             raise HTTPException(status_code=401, detail="Invalid credentials")
         
         print(f"User found: {user_data}")
-        user = User.from_dict(user_data)
+        user = user_data
         print(f"User object created from data")
         
         # Verify password
@@ -177,10 +182,10 @@ async def login(username: str = Form(...), password: str = Form(...)):
 
 # Get all users (for recipient selection)
 @app.get("/api/users")
-async def get_users(current_user: User = Depends(get_current_user)):
+async def get_users(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        users = await users_collection.find({}, {"username": 1, "_id": 0}).to_list(length=100)
-        return {"users": [user["username"] for user in users if user["username"] != current_user.username]}
+        users = await get_all_users(db, exclude_username=current_user.username)
+        return {"users": [user.username for user in users]}
     except Exception as e:
         print(f"Get users error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to get users: {str(e)}")
@@ -190,7 +195,8 @@ async def get_users(current_user: User = Depends(get_current_user)):
 async def upload_file(
     file: UploadFile = File(...),
     recipient_username: str = Form(...),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     try:
         # Validate file
@@ -200,49 +206,51 @@ async def upload_file(
         if not is_file_allowed(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
         
-        # Check if recipient exists
-        recipient_data = await users_collection.find_one({"username": recipient_username})
-        if not recipient_data:
-            raise HTTPException(status_code=404, detail="Recipient not found")
-        
-        # Read file content
-        file_content = await file.read()
-        
         # Check file size
+        file_content = await file.read()
         if len(file_content) > MAX_FILE_SIZE:
             raise HTTPException(status_code=400, detail="File too large")
         
-        # For now, we'll use a simple encryption approach
-        # In a real implementation, you would use the recipient's public key
-        # For demonstration, we'll just store the file encrypted with a simple key
+        # Check if recipient exists
+        recipient_data = await find_user_by_username(db, recipient_username)
+        if not recipient_data:
+            raise HTTPException(status_code=400, detail="Recipient not found")
         
-        # Create a simple encrypted version (this is just for demo)
+        # Generate unique file ID
+        file_id = str(uuid.uuid4())
+        
+        # For now, use simple encryption since crypto_utils might not be fully implemented
+        # In a real implementation, you would use the recipient's public key
         import base64
         encrypted_data = base64.b64encode(file_content)
+        ciphertext = b"demo_ciphertext"
+        signature = b"demo_signature"
+        nonce = b"demo_nonce"
+        sender_public_key = b"demo_public_key"
+        
+        # Save encrypted file to disk
+        encrypted_file_path = os.path.join("uploads", f"{file_id}.enc")
+        os.makedirs("uploads", exist_ok=True)
+        with open(encrypted_file_path, "wb") as f:
+            f.write(encrypted_data)
         
         # Create file record
-        file_id = str(uuid.uuid4())
         file_record = FileRecord(
             file_id=file_id,
             filename=file.filename,
             sender_username=current_user.username,
             recipient_username=recipient_username,
             encrypted_data=encrypted_data,
-            ciphertext=b"demo_ciphertext",
-            signature=b"demo_signature",
-            nonce=b"demo_nonce",
-            sender_public_key=b"demo_public_key"
+            ciphertext=ciphertext,
+            signature=signature,
+            nonce=nonce,
+            sender_public_key=sender_public_key
         )
         
         # Save to database
-        await files_collection.insert_one(file_record.to_dict())
+        await create_file_record(db, file_record)
         
-        return {
-            "message": "File uploaded successfully",
-            "file_id": file_id,
-            "filename": file.filename,
-            "recipient": recipient_username
-        }
+        return {"message": "File uploaded successfully", "file_id": file_id}
         
     except HTTPException:
         raise
@@ -250,64 +258,63 @@ async def upload_file(
         print(f"Upload error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 
-# Get user's received files
+# Get received files
 @app.get("/api/files/received")
-async def get_received_files(current_user: User = Depends(get_current_user)):
+async def get_received_files_endpoint(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        files = await files_collection.find(
-            {"recipient_username": current_user.username},
-            {"file_id": 1, "filename": 1, "sender_username": 1, "_id": 0}
-        ).to_list(length=100)
-        
-        return {"files": files}
+        files = await get_received_files(db, current_user.username)
+        return {"files": [file.to_dict() for file in files]}
     except Exception as e:
         print(f"Get received files error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to get received files: {str(e)}")
 
-# Get user's sent files
+# Get sent files
 @app.get("/api/files/sent")
-async def get_sent_files(current_user: User = Depends(get_current_user)):
+async def get_sent_files_endpoint(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        files = await files_collection.find(
-            {"sender_username": current_user.username},
-            {"file_id": 1, "filename": 1, "recipient_username": 1, "_id": 0}
-        ).to_list(length=100)
-        
-        return {"files": files}
+        files = await get_sent_files(db, current_user.username)
+        return {"files": [file.to_dict() for file in files]}
     except Exception as e:
         print(f"Get sent files error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to get sent files: {str(e)}")
 
-# Download and decrypt file
+# Download file
 @app.post("/api/download")
 async def download_file(
     file_id: str = Form(...),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     try:
         # Find file record
-        file_data = await files_collection.find_one({"file_id": file_id})
+        file_data = await find_file_by_id(db, file_id)
         if not file_data:
             raise HTTPException(status_code=404, detail="File not found")
         
-        file_record = FileRecord.from_dict(file_data)
-        
-        # Check if user is the recipient
-        if file_record.recipient_username != current_user.username:
+        # Check if user is sender or recipient
+        if file_data.sender_username != current_user.username and file_data.recipient_username != current_user.username:
             raise HTTPException(status_code=403, detail="Access denied")
+        
+        # Read encrypted file from disk
+        encrypted_file_path = os.path.join("uploads", f"{file_id}.enc")
+        if not os.path.exists(encrypted_file_path):
+            raise HTTPException(status_code=404, detail="File not found on disk")
+        
+        with open(encrypted_file_path, "rb") as f:
+            encrypted_data = f.read()
         
         # For demo purposes, just decode the base64 data
         import base64
-        decrypted_data = base64.b64decode(file_record.encrypted_data)
+        decrypted_data = base64.b64decode(encrypted_data)
         
-        # Create temporary file
-        temp_file_path = os.path.join(TEMP_DIR, f"{file_id}_{file_record.filename}")
+        # Create temporary file for download
+        temp_file_path = os.path.join(TEMP_DIR, f"{file_id}_dec")
         with open(temp_file_path, "wb") as f:
             f.write(decrypted_data)
         
         return FileResponse(
             temp_file_path,
-            filename=file_record.filename,
+            filename=file_data.filename,
             media_type="application/octet-stream"
         )
         
@@ -321,35 +328,26 @@ async def download_file(
 @app.get("/api/files/{file_id}/metadata")
 async def get_file_metadata(
     file_id: str,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     try:
         # Find file record
-        file_data = await files_collection.find_one({"file_id": file_id})
+        file_data = await find_file_by_id(db, file_id)
         if not file_data:
             raise HTTPException(status_code=404, detail="File not found")
         
-        file_record = FileRecord.from_dict(file_data)
-        
-        # Check if user is the recipient or sender
-        if (file_record.recipient_username != current_user.username and 
-            file_record.sender_username != current_user.username):
+        # Check if user is sender or recipient
+        if file_data.sender_username != current_user.username and file_data.recipient_username != current_user.username:
             raise HTTPException(status_code=403, detail="Access denied")
         
-        # Encode metadata for JSON response
-        metadata = encode_metadata(
-            file_record.ciphertext,
-            file_record.signature,
-            file_record.nonce,
-            file_record.sender_public_key
-        )
-        
+        # Return metadata
         return {
-            "file_id": file_record.file_id,
-            "filename": file_record.filename,
-            "sender_username": file_record.sender_username,
-            "recipient_username": file_record.recipient_username,
-            "metadata": metadata
+            "file_id": file_data.file_id,
+            "filename": file_data.filename,
+            "sender_username": file_data.sender_username,
+            "recipient_username": file_data.recipient_username,
+            "created_at": file_data.id  # Using ID as a proxy for created_at for now
         }
         
     except HTTPException:
@@ -360,13 +358,15 @@ async def get_file_metadata(
 
 # Health check
 @app.get("/api/health")
-async def health_check():
+async def health_check_endpoint(db: Session = Depends(get_db)):
     try:
-        # Test database connection
-        await users_collection.find_one()
-        return {"status": "healthy", "message": "Secure File Transfer System is running", "database": "connected"}
+        is_healthy = await health_check(db)
+        if is_healthy:
+            return {"status": "healthy", "database": "connected"}
+        else:
+            return {"status": "unhealthy", "database": "disconnected"}
     except Exception as e:
-        return {"status": "unhealthy", "message": f"Database connection failed: {str(e)}", "database": "disconnected"}
+        return {"status": "unhealthy", "error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn

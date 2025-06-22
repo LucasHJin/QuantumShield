@@ -23,16 +23,16 @@ A full-stack secure file transfer application built with post-quantum cryptograp
 - Sent files tracking
 
 ### 🏗️ Architecture
-- **Backend**: FastAPI with MongoDB
+- **Backend**: FastAPI with SQLite (via SQLAlchemy)
 - **Frontend**: Next.js with modern UI
-- **Database**: MongoDB for user and file storage
+- **Database**: SQLite for user and file storage
 - **Security**: All cryptographic operations server-side
 
 ## 🛠️ Tech Stack
 
 ### Backend
 - **FastAPI**: Modern Python web framework
-- **MongoDB**: NoSQL database with Motor async driver
+- **SQLite**: Serverless SQL database (via SQLAlchemy ORM)
 - **pyOQS**: Post-quantum cryptography library
 - **PyCryptodome**: AES-GCM encryption
 - **JWT**: Token-based authentication
@@ -49,7 +49,7 @@ A full-stack secure file transfer application built with post-quantum cryptograp
 
 - Python 3.8+
 - Node.js 16+
-- MongoDB 4.4+
+- (No database server required; uses local SQLite file)
 - Virtual environment (already set up)
 
 ## 🚀 Quick Start
@@ -59,10 +59,6 @@ A full-stack secure file transfer application built with post-quantum cryptograp
 Create a `.env` file in the `backend` directory with the following variables:
 
 ```bash
-# MongoDB Configuration
-MONGODB_URL=mongodb://localhost:27017
-DATABASE_NAME=secure_file_transfer
-
 # JWT Configuration
 SECRET_KEY=your-super-secret-key-change-this-in-production
 ACCESS_TOKEN_EXPIRE_MINUTES=30
@@ -78,19 +74,7 @@ MAX_FILE_SIZE=100
 CORS_ORIGINS=*
 ```
 
-### 2. Start MongoDB
-```bash
-# macOS
-brew services start mongodb-community
-
-# Ubuntu
-sudo systemctl start mongod
-
-# Windows
-# Start MongoDB service from Services
-```
-
-### 3. Run the Application
+### 2. Run the Application
 ```bash
 # Make the startup script executable (if not already)
 chmod +x start.sh
@@ -100,12 +84,12 @@ chmod +x start.sh
 ```
 
 This script will:
-- Check MongoDB status
 - Activate the virtual environment
 - Install all dependencies
+- Run database migration for SQLite
 - Start both backend and frontend servers
 
-### 4. Access the Application
+### 3. Access the Application
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
@@ -122,6 +106,9 @@ source .venv/bin/activate
 # Install dependencies
 cd backend
 pip install -r requirements.txt
+
+# Run database migration (creates SQLite DB if not present)
+python migrate_db.py
 
 # Start server
 python main.py
@@ -142,7 +129,7 @@ npm run dev
 ### Key Management
 - Each user gets unique Kyber and Dilithium key pairs
 - Private keys never leave the server
-- Keys stored securely in MongoDB
+- Keys stored securely in SQLite
 
 ### File Encryption Workflow
 1. **Sender**: Uses recipient's Kyber public key to encapsulate shared secret
@@ -157,32 +144,37 @@ npm run dev
 
 ## 📊 Database Schema
 
-### Users Collection
-```json
-{
-  "username": "alice",
-  "password_hash": "bcrypt_hash",
-  "kyber_public": "binary_data",
-  "kyber_private": "binary_data",
-  "dilithium_public": "binary_data",
-  "dilithium_private": "binary_data"
-}
-```
+### Users Table (SQLite)
+| Column         | Type     | Description                       |
+|---------------|----------|-----------------------------------|
+| id            | Integer  | Primary key                       |
+| username      | String   | Unique username                   |
+| email         | String   | Unique email                      |
+| hashed_password | String | Hashed password                   |
+| kem_public_key | Text    | Kyber public key (Base64)         |
+| kem_secret_key | Text    | Kyber secret key (Base64, encrypted) |
+| kem_salt      | Text     | Salt for KEM key encryption       |
+| kem_nonce     | Text     | Nonce for KEM key encryption      |
+| sig_public_key | Text    | Dilithium public key (Base64)     |
+| sig_secret_key | Text    | Dilithium secret key (Base64, encrypted) |
+| sig_salt      | Text     | Salt for signature key encryption |
+| sig_nonce     | Text     | Nonce for signature key encryption|
+| created_at    | DateTime | Account creation timestamp        |
 
-### Files Collection
-```json
-{
-  "file_id": "uuid",
-  "filename": "document.pdf",
-  "sender_username": "alice",
-  "recipient_username": "bob",
-  "encrypted_data": "binary_data",
-  "ciphertext": "kyber_ciphertext",
-  "signature": "dilithium_signature",
-  "nonce": "aes_nonce",
-  "sender_public_key": "dilithium_public_key"
-}
-```
+### SharedMetadata Table (SQLite)
+| Column            | Type     | Description                       |
+|-------------------|----------|-----------------------------------|
+| id                | Integer  | Primary key                       |
+| file_id           | String   | UUID for file                     |
+| encrypted_key     | Text     | Encrypted file key (Base64)       |
+| nonce             | Text     | Nonce for file encryption         |
+| signature         | Text     | Digital signature (Base64)        |
+| sender_public_key | Text     | Sender's Dilithium public key     |
+| sender_id         | Integer  | Foreign key to users (sender)     |
+| recipient_id      | Integer  | Foreign key to users (recipient)  |
+| encrypted_metadata| Text     | Encrypted metadata (Base64)       |
+| created_at        | DateTime | Timestamp                         |
+| is_read           | Boolean  | Read status                       |
 
 ## 🔧 API Endpoints
 
@@ -225,26 +217,6 @@ npm run dev
 
 ### Common Issues
 
-**MongoDB Connection Error**
-```bash
-# Check if MongoDB is running
-pgrep -x "mongod"
-
-# Start MongoDB if not running
-brew services start mongodb-community  # macOS
-sudo systemctl start mongod           # Ubuntu
-```
-
-**Port Already in Use**
-```bash
-# Check what's using the port
-lsof -i :8000  # Backend
-lsof -i :3000  # Frontend
-
-# Kill the process
-kill -9 <PID>
-```
-
 **Dependencies Issues**
 ```bash
 # Reinstall backend dependencies
@@ -282,7 +254,7 @@ pip list | grep python-dotenv
 spurhacks/
 ├── backend/
 │   ├── main.py              # FastAPI application
-│   ├── database.py          # MongoDB models and connection
+│   ├── database.py          # SQLite models and connection
 │   ├── auth.py              # Authentication utilities
 │   ├── crypto_utils.py      # PQC cryptography functions
 │   ├── requirements.txt     # Python dependencies
@@ -305,8 +277,6 @@ spurhacks/
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MONGODB_URL` | `mongodb://localhost:27017` | MongoDB connection string |
-| `DATABASE_NAME` | `secure_file_transfer` | Database name |
 | `SECRET_KEY` | `your-secret-key-change-in-production` | JWT secret key |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `30` | JWT token expiration time |
 | `HOST` | `0.0.0.0` | Server host |
