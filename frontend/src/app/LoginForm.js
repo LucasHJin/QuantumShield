@@ -84,9 +84,9 @@ export default function LoginForm({ onSwitchToRegister }) {
             <button
               type="button"
               onClick={onSwitchToRegister}
-              className="text-indigo-600 hover:text-indigo-500 text-sm"
+              className="text-indigo-600 hover:text-indigo-500 text-sm cursor-pointer inline-block"
             >
-              Don't have an account? Register here
+              Don't have an account? <div className="underline inline-block">Register here</div>
             </button>
           </div>
         </form>

@@ -5,7 +5,6 @@ import { AuthProvider, useAuth } from './AuthContext';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import Dashboard from './Dashboard';
-import UserAuth from './UserAuth';
 
 function AppContent() {
   const [showRegister, setShowRegister] = useState(false);
@@ -65,16 +64,6 @@ export default function Home() {
     localStorage.removeItem('quantumdocs_token');
     localStorage.removeItem('quantumdocs_user');
   };
-
-  if (!isAuthenticated) {
-    return (
-      <div style={{ padding: 20, maxWidth: 800, margin: '0 auto' }}>
-        <h1>QuantumDocs - Secure File Encryption</h1>
-        <p>Please log in or register to continue.</p>
-        <UserAuth onLogin={handleLogin} />
-      </div>
-    );
-  }
 
   return (
     <AuthProvider>

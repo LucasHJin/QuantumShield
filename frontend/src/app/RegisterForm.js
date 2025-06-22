@@ -112,9 +112,9 @@ export default function RegisterForm({ onSwitchToLogin }) {
             <button
               type="button"
               onClick={onSwitchToLogin}
-              className="text-indigo-600 hover:text-indigo-500 text-sm"
+              className="text-indigo-600 hover:text-indigo-500 text-sm cursor-pointer inline-block"
             >
-              Already have an account? Sign in here
+              Already have an account? <div className="underline inline-block">Sign in here</div>
             </button>
           </div>
         </form>
