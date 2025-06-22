@@ -73,37 +73,37 @@ export default function FileUpload() {
 
   if (isLoadingUsers) {
     return (
-      <div className="max-w-md mx-auto min-w-[600px] bg-[#3b275f]/20 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-[#eadaff]/30">
-        <h2 className="text-xl font-semibold mb-4 text-white">Upload File</h2>
-        <div className="text-center text-[#eadaff]">Loading users...</div>
+      <div className="bg-[#3b275f]/20 backdrop-blur-sm rounded-lg shadow-lg p-8 border border-[#eadaff]/30 min-h-[600px]">
+        <h2 className="text-2xl font-semibold mb-6 text-white">Upload File</h2>
+        <div className="text-center text-[#eadaff] text-lg">Loading users...</div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto min-w-[600px] bg-[#3b275f]/20 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-[#eadaff]/30">
-      <h2 className="text-xl font-semibold mb-4 text-white">Upload File</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="bg-[#3b275f]/20 backdrop-blur-sm rounded-lg shadow-lg p-8 border border-[#eadaff]/30 min-h-[600px]">
+      <h2 className="text-2xl font-semibold mb-8 text-white">Upload File</h2>
+      <form onSubmit={handleSubmit} className="space-y-8">
         <div>
-          <label className="block text-sm font-medium text-[#eadaff] mb-2">
+          <label className="block text-base font-medium text-[#eadaff] mb-4">
             Select File
           </label>
           <input
             type="file"
             onChange={handleFileChange}
-            className="block w-full text-sm text-[#eadaff] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#f38cff] file:text-white hover:file:bg-[#eadaff] transition-all duration-200"
+            className="block w-full text-base text-[#eadaff] file:mr-4 file:py-3 file:px-6 file:rounded-full file:border-0 file:text-base file:font-semibold file:bg-[#f38cff] file:text-white hover:file:bg-[#eadaff] file:hover:bg-[#eadaff] file:hover:text-black transition-all duration-200"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[#eadaff] mb-2">
+          <label className="block text-base font-medium text-[#eadaff] mb-4">
             Recipient
           </label>
           <select
             value={recipient}
             onChange={(e) => setRecipient(e.target.value)}
-            className="block w-full px-3 py-2 border border-[#eadaff] rounded-md shadow-sm focus:outline-none focus:ring-[#eadaff] focus:border-[#eadaff] bg-[#3b275f]/20 backdrop-blur-sm text-white"
+            className="block w-full px-4 py-3 border border-[#eadaff] rounded-lg shadow-sm focus:outline-none focus:ring-[#eadaff] focus:border-[#eadaff] bg-[#3b275f]/20 backdrop-blur-sm text-white text-base"
             required
           >
             <option value="">Select a recipient</option>
@@ -118,20 +118,26 @@ export default function FileUpload() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-lg text-sm font-medium text-white bg-[#3b275f] hover:bg-[#eadaff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#eadaff] disabled:opacity-50 transition-all duration-200"
+          className="w-full flex justify-center py-4 px-6 border border-transparent rounded-lg shadow-lg text-base font-medium text-white bg-[#3b275f] hover:bg-[#eadaff] hover:text-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#eadaff] disabled:opacity-50 transition-all duration-200"
         >
           {isLoading ? 'Uploading...' : 'Upload & Encrypt'}
         </button>
       </form>
 
       {selectedFile && (
-        <div className="mt-4 p-3 bg-[#3b275f]/20 backdrop-blur-sm rounded-md border border-[#eadaff]/30">
-          <p className="text-sm text-[#eadaff]">
-            <strong>Selected file:</strong> {selectedFile.name}
-          </p>
-          <p className="text-sm text-[#eadaff]">
-            <strong>Size:</strong> {(selectedFile.size / 1024).toFixed(2)} KB
-          </p>
+        <div className="mt-8 p-6 bg-[#3b275f]/20 backdrop-blur-sm rounded-lg border border-[#eadaff]/30">
+          <h3 className="text-lg font-semibold text-white mb-4">Selected File</h3>
+          <div className="space-y-3">
+            <p className="text-base text-[#eadaff]">
+              <span className="font-medium">Name:</span> {selectedFile.name}
+            </p>
+            <p className="text-base text-[#eadaff]">
+              <span className="font-medium">Size:</span> {(selectedFile.size / 1024).toFixed(2)} KB
+            </p>
+            <p className="text-base text-[#eadaff]">
+              <span className="font-medium">Type:</span> {selectedFile.type || 'Unknown'}
+            </p>
+          </div>
         </div>
       )}
     </div>

@@ -10,16 +10,16 @@ import Footer from './Footer';
 import { Toaster } from 'react-hot-toast';
 
 export default function Dashboard({ onBackToLanding }) {
-  const [activeTab, setActiveTab] = useState('upload');
+  const [activeTab, setActiveTab] = useState('received');
   const { user } = useAuth();
 
-  const tabs = [
-    { id: 'upload', name: 'Upload File', component: FileUpload },
-    { id: 'inbox', name: 'Received Files', component: FileInbox },
-    { id: 'sent', name: 'Sent Files', component: SentFiles },
-  ];
-
-  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component;
+  const renderFileSection = () => {
+    if (activeTab === 'received') {
+      return <FileInbox />;
+    } else {
+      return <SentFiles />;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black flex flex-col">
@@ -41,31 +41,47 @@ export default function Dashboard({ onBackToLanding }) {
         activeAuthTab=""
       />
 
-      {/* Navigation */}
-      <nav className="bg-black border-b border-[#eadaff]/30 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
-                  activeTab === tab.id
-                    ? 'border-[#f38cff] text-[#f38cff]'
-                    : 'border-transparent text-[#eadaff] hover:text-white hover:border-[#eadaff]'
-                }`}
-              >
-                {tab.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      </nav>
-
       {/* Main Content */}
-      <main className="flex-grow max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          {ActiveComponent && <ActiveComponent />}
+      <main className="flex-grow w-full px-8 py-8">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex gap-12">
+            {/* Left Section - Upload (1/3) */}
+            <div className="w-1/3 flex-shrink-0">
+              <FileUpload />
+            </div>
+            
+            {/* Right Section - Files (2/3) */}
+            <div className="w-2/3 flex-grow">
+              {/* Toggle for Received/Sent */}
+              <div className="mb-8">
+                <div className="flex bg-[#3b275f]/20 rounded-lg p-1 border border-[#eadaff]/30">
+                  <button
+                    onClick={() => setActiveTab('received')}
+                    className={`flex-1 py-3 px-6 rounded-md text-sm font-medium transition-all duration-200 ${
+                      activeTab === 'received'
+                        ? 'bg-[#f38cff] text-black shadow-lg'
+                        : 'text-[#eadaff] hover:text-white'
+                    }`}
+                  >
+                    Received Files
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('sent')}
+                    className={`flex-1 py-3 px-6 rounded-md text-sm font-medium transition-all duration-200 ${
+                      activeTab === 'sent'
+                        ? 'bg-[#f38cff] text-black shadow-lg'
+                        : 'text-[#eadaff] hover:text-white'
+                    }`}
+                  >
+                    Sent Files
+                  </button>
+                </div>
+              </div>
+              
+              {/* File Section */}
+              {renderFileSection()}
+            </div>
+          </div>
         </div>
       </main>
 
